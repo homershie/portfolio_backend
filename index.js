@@ -23,7 +23,7 @@ app.post("/api/send-email", async (req, res) => {
 
   try {
     const data = await resend.emails.send({
-      from: "HODES <contact@homershie.com>", // 建議換成你自己的 verified domain
+      from: "HODES <contact@homershie.com>",
       to,
       subject: subject || "Portfolio 聯絡表單",
       html: `
@@ -33,8 +33,14 @@ app.post("/api/send-email", async (req, res) => {
         <p>${message.replace(/\n/g, "<br>")}</p>
       `,
     });
+    console.log("📧 Email 發送成功:", {
+      to,
+      subject,
+      timestamp: new Date().toISOString(),
+    });
     res.status(200).json({ success: true, data });
   } catch (error) {
+    console.error("❌ Email 發送失敗:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
