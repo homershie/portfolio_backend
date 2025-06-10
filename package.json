@@ -1,5 +1,5 @@
 {
-  "types": "module",
+  "type": "module",
   "name": "portfolio_backend",
   "version": "1.0.0",
   "description": "",
@@ -12,7 +12,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",

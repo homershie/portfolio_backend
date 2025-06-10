@@ -39,7 +39,12 @@ app.post("/api/send-email", async (req, res) => {
   }
 });
 
+app.get("/", (req, res) => {
+  res.send("OK");
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log("NODE_ENV:", process.env.NODE_ENV);
 });
