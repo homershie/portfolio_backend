@@ -1,39 +1,45 @@
-import express from 'express'
-import cors from 'cors'
-import nodemailer from 'nodemailer'
-import dotenv from 'dotenv'
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import { Resend } from "resend";
 
-dotenv.config()
-const app = express()
-app.use(cors())
-app.use(express.json())
+dotenv.config();
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: +process.env.SMTP_PORT,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-})
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-app.post('/api/send-email', async (req, res) => {
-  const { name, email, subject, message } = req.body
-  try {
-    await transporter.sendMail({
-      from: `"Contact Form" <${process.env.SMTP_USER}>`,
-      to: process.env.TO_EMAIL,
-      subject: subject || 'New message from portfolio',
-      text: `寄件者：${name} <${email}>\n\n${message}`,
-    })
-    res.sendStatus(200)
-  } catch (err) {
-    console.error(err)
-    res.sendStatus(500)
+app.post("/api/send-email", async (req, res) => {
+  const { name, email, subject, message } = req.body;
+
+  // 收件人寫死，避免濫用
+  const to = process.env.TO_EMAIL;
+
+  // 基本驗證
+  if (!name || !email || !message) {
+    return res.status(400).json({ success: false, error: "缺少必要欄位" });
   }
-})
 
-const PORT = process.env.PORT || 3000
+  try {
+    const data = await resend.emails.send({
+      from: "你的寄件人 <onboarding@resend.dev>", // 建議換成你自己的 verified domain
+      to,
+      subject: subject || "Portfolio 聯絡表單",
+      html: `
+        <p><b>姓名：</b>${name}</p>
+        <p><b>Email：</b>${email}</p>
+        <p><b>訊息：</b></p>
+        <p>${message.replace(/\n/g, "<br>")}</p>
+      `,
+    });
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`)
-})
+  console.log(`Server running on port ${PORT}`);
+});
