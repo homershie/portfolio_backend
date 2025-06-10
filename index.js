@@ -23,7 +23,7 @@ app.post("/api/send-email", async (req, res) => {
 
   try {
     const data = await resend.emails.send({
-      from: "你的寄件人 <onboarding@resend.dev>", // 建議換成你自己的 verified domain
+      from: "HODES <contact@homershie.com>", // 建議換成你自己的 verified domain
       to,
       subject: subject || "Portfolio 聯絡表單",
       html: `
